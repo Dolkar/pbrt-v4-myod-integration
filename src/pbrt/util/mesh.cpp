@@ -17,6 +17,7 @@
 namespace pbrt {
 
 STAT_RATIO("Geometry/Triangles per mesh", nTris, nTriMeshes);
+STAT_RATIO("Geometry/Points per sest", nPts, nPtSets);
 STAT_MEMORY_COUNTER("Memory/Triangles", triangleBytes);
 
 // TriangleMesh Method Definitions
@@ -470,6 +471,47 @@ std::string TriQuadMesh::ToString() const {
     return StringPrintf("[ TriQuadMesh p: %s n: %s uv: %s faceIndices: %s triIndices: %s "
                         "quadIndices: %s ]",
                         p, n, uv, faceIndices, triIndices, quadIndices);
+}
+
+PointSet::PointSet(const Transform &renderFromObject, std::vector<Point3f> p,
+                   std::vector<Normal3f> n, std::vector<Float> r, Allocator alloc)
+    : nPoints(p.size()) {
+    ++nPtSets;
+    nPts += nPoints;
+
+    // Transform points to rendering space and initialize point set _p_
+    for (Point3f &pt : p)
+        pt = renderFromObject(pt);
+    this->p = point3BufferCache->LookupOrAdd(p, alloc);
+
+    CHECK_EQ(nPoints, n.size());
+    for (Normal3f &nn : n) {
+        nn = renderFromObject(nn);
+    }
+    this->n = normal3BufferCache->LookupOrAdd(n, alloc);
+
+    // Calculate uniform scale
+    Float la2 = LengthSquared(renderFromObject(Vector3f(1, 0, 0)));
+    Float lb2 = LengthSquared(renderFromObject(Vector3f(0, 1, 0)));
+    Float lc2 = LengthSquared(renderFromObject(Vector3f(0, 0, 1)));
+    Float scale = SafeSqrt((la2 + lb2 + lc2) / 3.0f);
+
+    CHECK_EQ(nPoints, r.size());
+    for (Float &rr : r)
+        rr = scale * rr;
+    this->r = floatBufferCache->LookupOrAdd(r, alloc);
+
+    // Make sure that we don't have too much stuff to be using integers to
+    // index into things.
+    CHECK_LE(p.size(), std::numeric_limits<int>::max());
+}
+
+std::string PointSet::ToString() const {
+    std::string np = "(nullptr)";
+    return StringPrintf("[ PointSet nPoints: %d p: %s n: %s r: %s]", nPoints,
+                        p ? StringPrintf("%s", pstd::MakeSpan(p, nPoints)) : np,
+                        n ? StringPrintf("%s", pstd::MakeSpan(n, nPoints)) : np,
+                        r ? StringPrintf("%s", pstd::MakeSpan(r, nPoints)) : np);
 }
 
 }  // namespace pbrt

@@ -568,14 +568,14 @@ SET (PBRT_CPU_SOURCE
   src/pbrt/cpu/integrators.cpp
   src/pbrt/cpu/primitive.cpp
   src/pbrt/cpu/render.cpp
-)
+ "src/pbrt/cpu/apss.cpp")
 
 SET (PBRT_CPU_SOURCE_HEADERS
   src/pbrt/cpu/aggregates.h
   src/pbrt/cpu/integrators.h
   src/pbrt/cpu/primitive.h
   src/pbrt/cpu/render.h
-)
+ "src/pbrt/cpu/apss.h")
 
 SET (PBRT_WAVEFRONT_SOURCE
   src/pbrt/wavefront/aggregate.cpp

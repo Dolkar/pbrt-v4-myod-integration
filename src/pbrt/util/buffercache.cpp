@@ -14,6 +14,7 @@ BufferCache<Point2f> *point2BufferCache;
 BufferCache<Point3f> *point3BufferCache;
 BufferCache<Vector3f> *vector3BufferCache;
 BufferCache<Normal3f> *normal3BufferCache;
+BufferCache<Float> *floatBufferCache;
 
 void InitBufferCaches() {
     CHECK(intBufferCache == nullptr);
@@ -22,6 +23,7 @@ void InitBufferCaches() {
     point3BufferCache = new BufferCache<Point3f>;
     vector3BufferCache = new BufferCache<Vector3f>;
     normal3BufferCache = new BufferCache<Normal3f>;
+    floatBufferCache = new BufferCache<Float>;
 }
 
 }  // namespace pbrt

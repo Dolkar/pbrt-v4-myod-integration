@@ -108,6 +108,8 @@ extern BufferCache<Point2f> *point2BufferCache;
 extern BufferCache<Point3f> *point3BufferCache;
 extern BufferCache<Vector3f> *vector3BufferCache;
 extern BufferCache<Normal3f> *normal3BufferCache;
+// #MYOD
+extern BufferCache<Float> *floatBufferCache;
 
 void InitBufferCaches();
 

@@ -5,6 +5,7 @@
 #include <pbrt/cpu/primitive.h>
 
 #include <pbrt/cpu/aggregates.h>
+#include <pbrt/cpu/apss.h>
 #include <pbrt/interaction.h>
 #include <pbrt/materials.h>
 #include <pbrt/shapes.h>
