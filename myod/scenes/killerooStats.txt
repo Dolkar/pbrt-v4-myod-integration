@@ -1,0 +1,29 @@
+Rendering: [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++]  (19.7s)
+Statistics:
+  BVH
+    Interior nodes                                                  64891
+    Leaf nodes                                                      64892
+    Nodes visited                                              1273462823
+    Primitives per leaf node                         66533 /        64892 (1.03x)
+  Geometry
+    Spheres                                                             2
+    Buffer cache hits                                    4 /           12 (33.33%)
+    Triangles per mesh                               66532 /            4 (16633.00x)
+  Integrator
+    Camera rays traced                                           16000000
+    Surface interactions                                         24504573
+  Intersections
+    Regular ray intersection tests                               60254741
+    Ray-Triangle intersection tests               28895333 /     88819085 (0.33x)
+  Memory
+    BVH                                                              4.47 MiB
+    Film pixels                                                     53.41 MiB
+    Light BVH                                                        0.07 kB
+    Primitives                                                       1.02 MiB
+    Redundant vertex and index buffers                             587.90 kB
+    Triangles                                                      520.03 kB
+    Unreported / unused                                             12.73 MiB
+  Scene
+    AreaLights                                                          1
+    Lights                                                              1
+    Materials                                                           5

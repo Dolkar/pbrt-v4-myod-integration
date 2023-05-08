@@ -1,0 +1,1 @@
+"../../out/build/x64-Release/pbrt.exe" --display-server localhost:14158 --stats "killeroos/killeroo-myod.pbrt"
