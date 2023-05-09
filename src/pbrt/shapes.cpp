@@ -1491,8 +1491,13 @@ pstd::vector<Shape> Shape::Create(
                                            vertexIndices, P, alloc);
 
         shapes = Triangle::CreateTriangles(mesh, alloc);
-    } else
+    // #MYOD
+    } else if (name == "apss" || name == "apssMesh") {
+        // No Shape associated with these
+        return {};
+    } else {
         ErrorExit(loc, "%s: shape type unknown.", name);
+    }
 
     if (shapes.empty())
         ErrorExit(loc, "%s: unable to create shape.", name);

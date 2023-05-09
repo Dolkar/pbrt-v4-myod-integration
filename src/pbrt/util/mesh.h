@@ -178,22 +178,6 @@ struct TriQuadMesh {
     }
 };
 
-// #MYOD
-struct PointSet {
-  public:
-    // PointSet Public Methods
-    PointSet(const Transform &renderFromObject, std::vector<Point3f> p,
-             std::vector<Normal3f> n, std::vector<Float> r, Allocator alloc);
-
-    std::string ToString() const;
-
-    // PointSet Public Members
-    int nPoints;
-    const Point3f *p = nullptr;
-    const Normal3f *n = nullptr;
-    const Float *r = nullptr;
-};
-
 bool WritePLY(std::string filename, pstd::span<const int> triIndices,
               pstd::span<const int> quadIndices, pstd::span<const Point3f> p,
               pstd::span<const Normal3f> n, pstd::span<const Point2f> uv,

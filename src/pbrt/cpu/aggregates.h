@@ -21,8 +21,18 @@ Primitive CreateAccelerator(const std::string &name, std::vector<Primitive> prim
 
 struct BVHBuildNode;
 struct BVHPrimitive;
-struct LinearBVHNode;
 struct MortonPrimitive;
+
+// LinearBVHNode Definition
+struct alignas(32) LinearBVHNode {
+    Bounds3f bounds;
+    union {
+        int primitivesOffset;   // leaf
+        int secondChildOffset;  // interior
+    };
+    uint16_t nPrimitives;  // 0 -> interior node
+    uint8_t axis;          // interior node: xyz
+};
 
 // BVHAggregate Definition
 class BVHAggregate {
@@ -40,6 +50,9 @@ class BVHAggregate {
     Bounds3f Bounds() const;
     pstd::optional<ShapeIntersection> Intersect(const Ray &ray, Float tMax) const;
     bool IntersectP(const Ray &ray, Float tMax) const;
+
+    const std::vector<Primitive> &GetPrimitives() { return primitives; }
+    const std::vector<LinearBVHNode> &GetFlattenedNodes() const { return nodes; }
 
   private:
     // BVHAggregate Private Methods
@@ -66,7 +79,7 @@ class BVHAggregate {
     int maxPrimsInNode;
     std::vector<Primitive> primitives;
     SplitMethod splitMethod;
-    LinearBVHNode *nodes = nullptr;
+    std::vector<LinearBVHNode> nodes;
 };
 
 struct KdTreeNode;

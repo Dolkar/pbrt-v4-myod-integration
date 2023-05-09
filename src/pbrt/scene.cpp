@@ -5,6 +5,7 @@
 #include <pbrt/scene.h>
 
 #include <pbrt/cpu/aggregates.h>
+#include <pbrt/cpu/apss.h>
 #include <pbrt/cpu/integrators.h>
 #ifdef PBRT_BUILD_GPU_RENDERER
 #include <pbrt/gpu/memory.h>
@@ -1400,7 +1401,9 @@ Primitive BasicScene::CreateAggregate(
         for (size_t i = 0; i < shapes.size(); ++i) {
             auto &sh = shapes[i];
             pstd::vector<pbrt::Shape> &shapes = shapeVectors[i];
-            if (shapes.empty())
+            // #MYOD
+            bool isApss = sh.name == "apss" || sh.name == "apssMesh";
+            if (shapes.empty() && !isApss)
                 continue;
 
             FloatTexture alphaTex = getAlphaTexture(sh.parameters, &sh.loc);
@@ -1419,6 +1422,21 @@ Primitive BasicScene::CreateAggregate(
 
             pbrt::MediumInterface mi(findMedium(sh.insideMedium, &sh.loc),
                                      findMedium(sh.outsideMedium, &sh.loc));
+
+            // #MYOD
+            if (isApss) {
+                if (mi.IsMediumTransition() || alphaTex)
+                    ErrorExit(&sh.loc, "Unsupported APSS feature.");
+                if (sh.name == "apssMesh") {
+                    TriangleMesh *mesh = Triangle::CreateMesh(
+                        sh.renderFromObject, sh.reverseOrientation, sh.parameters, &sh.loc, alloc);
+                    Float radiusMult = sh.parameters.GetOneFloat("radiusmult", 1.0f);
+                    primitives.push_back(PointSet::FromTriangleMesh(mesh, radiusMult, alloc));
+                } else if (sh.name == "apss") {
+                    // TODO
+                    ErrorExit(&sh.loc, "%s: shape type unknown.", sh.name);
+                }
+            }
 
             auto iter = shapeIndexToAreaLights.find(i);
             for (size_t j = 0; j < shapes.size(); ++j) {

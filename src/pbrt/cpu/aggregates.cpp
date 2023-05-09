@@ -125,17 +125,6 @@ struct BVHBuildNode {
     int splitAxis, firstPrimOffset, nPrimitives;
 };
 
-// LinearBVHNode Definition
-struct alignas(32) LinearBVHNode {
-    Bounds3f bounds;
-    union {
-        int primitivesOffset;   // leaf
-        int secondChildOffset;  // interior
-    };
-    uint16_t nPrimitives;  // 0 -> interior node
-    uint8_t axis;          // interior node: xyz
-};
-
 // BVHAggregate Method Definitions
 BVHAggregate::BVHAggregate(std::vector<Primitive> prims, int maxPrimsInNode,
                            SplitMethod splitMethod)
@@ -182,7 +171,7 @@ BVHAggregate::BVHAggregate(std::vector<Primitive> prims, int maxPrimsInNode,
                 float(totalNodes.load() * sizeof(LinearBVHNode)) / (1024.f * 1024.f));
     treeBytes += totalNodes * sizeof(LinearBVHNode) + sizeof(*this) +
                  primitives.size() * sizeof(primitives[0]);
-    nodes = new LinearBVHNode[totalNodes];
+    nodes.resize(totalNodes);
     int offset = 0;
     flattenBVH(root, &offset);
     CHECK_EQ(totalNodes.load(), offset);
@@ -521,13 +510,13 @@ int BVHAggregate::flattenBVH(BVHBuildNode *node, int *offset) {
 }
 
 Bounds3f BVHAggregate::Bounds() const {
-    CHECK(nodes);
+    CHECK(!nodes.empty());
     return nodes[0].bounds;
 }
 
 pstd::optional<ShapeIntersection> BVHAggregate::Intersect(const Ray &ray,
                                                           Float tMax) const {
-    if (!nodes)
+    if (nodes.empty())
         return {};
     pstd::optional<ShapeIntersection> si;
     Vector3f invDir(1 / ray.d.x, 1 / ray.d.y, 1 / ray.d.z);
@@ -578,7 +567,7 @@ pstd::optional<ShapeIntersection> BVHAggregate::Intersect(const Ray &ray,
 }
 
 bool BVHAggregate::IntersectP(const Ray &ray, Float tMax) const {
-    if (!nodes)
+    if (nodes.empty())
         return false;
     Vector3f invDir(1.f / ray.d.x, 1.f / ray.d.y, 1.f / ray.d.z);
     int dirIsNeg[3] = {static_cast<int>(invDir.x < 0), static_cast<int>(invDir.y < 0),
